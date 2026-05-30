@@ -50,6 +50,8 @@ const (
 	ARTIST_SEPARATORS_ENV          = "KOITO_ARTIST_SEPARATORS_REGEX"
 	LOGIN_GATE_ENV                 = "KOITO_LOGIN_GATE"
 	FORCE_TZ                       = "KOITO_FORCE_TZ"
+	DATE_FORMAT_ENV                = "KOITO_DATE_FORMAT"
+	CLOCK_FORMAT_ENV               = "KOITO_CLOCK_FORMAT"
 )
 
 type config struct {
@@ -89,6 +91,8 @@ type config struct {
 	artistSeparators       []*regexp.Regexp
 	loginGate              bool
 	forceTZ                *time.Location
+	dateFormat             string
+	clockFormat            string
 }
 
 var (
@@ -191,6 +195,24 @@ func loadConfig(getenv func(string) string, version string) (*config, error) {
 	}
 
 	cfg.defaultTheme = getenv(DEFAULT_THEME_ENV)
+
+	rawDateFormat := getenv(DATE_FORMAT_ENV)
+	if rawDateFormat != "" {
+		validFormat := regexp.MustCompile(`^(DD|MM|YYYY)([-/.](DD|MM|YYYY)){2}$`)
+		if !validFormat.MatchString(rawDateFormat) ||
+			!strings.Contains(rawDateFormat, "DD") ||
+			!strings.Contains(rawDateFormat, "MM") ||
+			!strings.Contains(rawDateFormat, "YYYY") {
+			return nil, fmt.Errorf("loadConfig: %s must use DD, MM, and YYYY tokens with a single / - or . separator (e.g. DD/MM/YYYY)", DATE_FORMAT_ENV)
+		}
+	}
+	cfg.dateFormat = rawDateFormat
+
+	rawClockFormat := getenv(CLOCK_FORMAT_ENV)
+	if rawClockFormat != "" && rawClockFormat != "12h" && rawClockFormat != "24h" {
+		return nil, fmt.Errorf("loadConfig: %s must be either '12h' or '24h'", CLOCK_FORMAT_ENV)
+	}
+	cfg.clockFormat = rawClockFormat
 
 	cfg.configDir = getenv(CONFIG_DIR_ENV)
 	if cfg.configDir == "" {

@@ -96,6 +96,18 @@ func DefaultTheme() string {
 	return globalConfig.defaultTheme
 }
 
+func DateFormat() string {
+	lock.RLock()
+	defer lock.RUnlock()
+	return globalConfig.dateFormat
+}
+
+func ClockFormat() string {
+	lock.RLock()
+	defer lock.RUnlock()
+	return globalConfig.clockFormat
+}
+
 func DeezerDisabled() bool {
 	lock.RLock()
 	defer lock.RUnlock()

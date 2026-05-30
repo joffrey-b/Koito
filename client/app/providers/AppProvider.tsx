@@ -12,6 +12,8 @@ interface AppContextType {
   configurableHomeActivity: boolean;
   homeItems: number;
   defaultTheme: string;
+  dateFormat: string;
+  clockFormat: string;
   currentVersion: string;
   updateAvailable: boolean;
   firstActivity: Date | undefined;
@@ -38,6 +40,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [configurableHomeActivity, setConfigurableHomeActivity] =
     useState<boolean>(false);
   const [homeItems, setHomeItems] = useState<number>(0);
+  const [dateFormat, setDateFormat] = useState<string>("");
+  const [clockFormat, setClockFormat] = useState<string>("");
 
   const setUsername = (value: string) => {
     if (!user) {
@@ -69,6 +73,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         setDefaultTheme("yuu");
       }
+      setDateFormat(cfg.date_format ?? "");
+      setClockFormat(cfg.clock_format ?? "");
     });
 
     fetch("/apis/web/v1/first-activity")
@@ -100,6 +106,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     configurableHomeActivity,
     homeItems,
     defaultTheme,
+    dateFormat,
+    clockFormat,
     currentVersion,
     updateAvailable,
     firstActivity,

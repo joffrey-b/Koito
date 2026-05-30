@@ -26,6 +26,17 @@ If the environment variable is defined without **and** with the suffix at the sa
 - Default: `yuu`
 - Description: The lowercase name of the default theme to be used by the client. Overridden if a user picks a theme in the theme switcher.
 
+##### KOITO_DATE_FORMAT
+
+- Default: Browser locale
+- Description: The date format to use when displaying dates. Must use the `DD`, `MM`, and `YYYY` tokens each exactly once, separated by `/`, `-`, or `.`. When not set, the browser locale determines the format.
+- Example: `DD/MM/YYYY` produces `21/04/2026`
+
+##### KOITO_CLOCK_FORMAT
+
+- Default: Browser locale
+- Description: The clock format to use when displaying times. Accepted values are `12h` and `24h`. When not set, the browser locale determines the format.
+
 ##### KOITO_LOGIN_GATE
 
 - Default: `false`

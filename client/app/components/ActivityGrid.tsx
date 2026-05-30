@@ -1,4 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
+import { useAppContext } from "~/providers/AppProvider";
+import { formatDate } from "~/utils/utils";
 import Popup from "./Popup";
 import {
   apiFetch,
@@ -55,6 +57,7 @@ export default function ActivityGrid({
     queryFn: () => getActivity(args),
   });
 
+  const { dateFormat } = useAppContext();
   const width = useWindowWidth();
 
   if (isPending) {
@@ -165,7 +168,7 @@ export default function ActivityGrid({
                     position="top"
                     space={12}
                     extraClasses="left-2"
-                    inner={`${cell.date.toLocaleDateString()} ${
+                    inner={`${formatDate(cell.date, dateFormat)} ${
                       cell.listens
                     } plays`}
                   >

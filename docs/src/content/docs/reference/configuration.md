@@ -37,6 +37,12 @@ If the environment variable is defined without **and** with the suffix at the sa
 - Default: Browser locale
 - Description: The clock format to use when displaying times. Accepted values are `12h` and `24h`. When not set, the browser locale determines the format.
 
+##### KOITO_WEEK_START
+
+- Default: Browser locale
+- Description: The first day of the week to use in the activity grid. Accepted values are `Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`, `Saturday`, and `Sunday`. When not set, the browser locale determines the first day (falls back to Monday in Firefox).
+- Example: `Monday` for most European locales
+
 ##### KOITO_LOGIN_GATE
 
 - Default: `false`

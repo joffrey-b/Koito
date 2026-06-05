@@ -52,6 +52,7 @@ const (
 	FORCE_TZ                       = "KOITO_FORCE_TZ"
 	DATE_FORMAT_ENV                = "KOITO_DATE_FORMAT"
 	CLOCK_FORMAT_ENV               = "KOITO_CLOCK_FORMAT"
+	WEEK_START_ENV                 = "KOITO_WEEK_START"
 )
 
 type config struct {
@@ -93,6 +94,7 @@ type config struct {
 	forceTZ                *time.Location
 	dateFormat             string
 	clockFormat            string
+	weekStart              string
 }
 
 var (
@@ -213,6 +215,16 @@ func loadConfig(getenv func(string) string, version string) (*config, error) {
 		return nil, fmt.Errorf("loadConfig: %s must be either '12h' or '24h'", CLOCK_FORMAT_ENV)
 	}
 	cfg.clockFormat = rawClockFormat
+
+	validWeekDays := map[string]bool{
+		"Monday": true, "Tuesday": true, "Wednesday": true, "Thursday": true,
+		"Friday": true, "Saturday": true, "Sunday": true,
+	}
+	rawWeekStart := getenv(WEEK_START_ENV)
+	if rawWeekStart != "" && !validWeekDays[rawWeekStart] {
+		return nil, fmt.Errorf("loadConfig: %s must be one of: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday", WEEK_START_ENV)
+	}
+	cfg.weekStart = rawWeekStart
 
 	cfg.configDir = getenv(CONFIG_DIR_ENV)
 	if cfg.configDir == "" {

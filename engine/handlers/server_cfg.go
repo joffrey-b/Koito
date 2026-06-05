@@ -11,6 +11,7 @@ type ServerConfig struct {
 	DefaultTheme string `json:"default_theme"`
 	DateFormat   string `json:"date_format"`
 	ClockFormat  string `json:"clock_format"`
+	WeekStart    string `json:"week_start"`
 }
 
 func GetCfgHandler() http.HandlerFunc {
@@ -19,6 +20,7 @@ func GetCfgHandler() http.HandlerFunc {
 			DefaultTheme: cfg.DefaultTheme(),
 			DateFormat:   cfg.DateFormat(),
 			ClockFormat:  cfg.ClockFormat(),
+			WeekStart:    cfg.WeekStart(),
 		})
 	}
 }

@@ -108,6 +108,12 @@ func ClockFormat() string {
 	return globalConfig.clockFormat
 }
 
+func WeekStart() string {
+	lock.RLock()
+	defer lock.RUnlock()
+	return globalConfig.weekStart
+}
+
 func DeezerDisabled() bool {
 	lock.RLock()
 	defer lock.RUnlock()

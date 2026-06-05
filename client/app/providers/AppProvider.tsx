@@ -14,6 +14,7 @@ interface AppContextType {
   defaultTheme: string;
   dateFormat: string;
   clockFormat: string;
+  weekStart: string;
   currentVersion: string;
   updateAvailable: boolean;
   firstActivity: Date | undefined;
@@ -42,6 +43,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [homeItems, setHomeItems] = useState<number>(0);
   const [dateFormat, setDateFormat] = useState<string>("");
   const [clockFormat, setClockFormat] = useState<string>("");
+  const [weekStart, setWeekStart] = useState<string>("");
 
   const setUsername = (value: string) => {
     if (!user) {
@@ -75,6 +77,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       }
       setDateFormat(cfg.date_format ?? "");
       setClockFormat(cfg.clock_format ?? "");
+      setWeekStart(cfg.week_start ?? "");
     });
 
     fetch("/apis/web/v1/first-activity")
@@ -108,6 +111,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     defaultTheme,
     dateFormat,
     clockFormat,
+    weekStart,
     currentVersion,
     updateAvailable,
     firstActivity,

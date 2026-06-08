@@ -89,7 +89,7 @@ export default function InterestGraph({ buckets = 16, type, id }: Props) {
             height: "120px",
           }}
           data={data}
-          margin={{ top: 20, right: 10, bottom: 5, left: -20 }}
+          margin={{ top: 20, right: 10, bottom: 5, left: 0 }}
         >
           <defs>
             <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">

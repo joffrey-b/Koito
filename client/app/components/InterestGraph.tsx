@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch, type InterestBucket } from "api/api";
+import { useAppContext } from "~/providers/AppProvider";
 import { useTheme } from "~/hooks/useTheme";
+import { formatDate } from "~/utils/utils";
 import { Area, AreaChart, XAxis, YAxis, Tooltip } from "recharts";
 import CardHeader from "./primitives/CardHeader";
 
@@ -19,9 +21,10 @@ const getInterest = (args: { buckets: number; type: string; id: number }) =>
 interface InterestTooltipProps {
   active?: boolean;
   payload?: { payload: InterestBucket }[];
+  dateFormat: string;
 }
 
-function InterestTooltip({ active, payload }: InterestTooltipProps) {
+function InterestTooltip({ active, payload, dateFormat }: InterestTooltipProps) {
   if (!active || !payload || !payload.length) {
     return null;
   }
@@ -30,8 +33,8 @@ function InterestTooltip({ active, payload }: InterestTooltipProps) {
   const end = new Date(bucket.bucket_end);
   const range =
     start.toDateString() === end.toDateString()
-      ? start.toLocaleDateString()
-      : `${start.toLocaleDateString()} – ${end.toLocaleDateString()}`;
+      ? formatDate(start, dateFormat)
+      : `${formatDate(start, dateFormat)} – ${formatDate(end, dateFormat)}`;
 
   return (
     <div className="bg-(--color-bg) color-fg border-1 border-(--color-bg-tertiary) px-3 py-2 rounded-lg text-[12px]">
@@ -59,6 +62,7 @@ export default function InterestGraph({ buckets = 16, type, id }: Props) {
 
   const { theme } = useTheme();
   const color = theme.primary;
+  const { dateFormat } = useAppContext();
 
   const title = "Interest over time";
 
@@ -99,7 +103,7 @@ export default function InterestGraph({ buckets = 16, type, id }: Props) {
           </defs>
           <XAxis
             dataKey="bucket_start"
-            tickFormatter={(v) => new Date(v).toLocaleDateString()}
+            tickFormatter={(v) => formatDate(new Date(v), dateFormat)}
             stroke="var(--color-fg-tertiary)"
             tick={{ fontSize: 11 }}
             tickLine={false}
@@ -115,7 +119,7 @@ export default function InterestGraph({ buckets = 16, type, id }: Props) {
             width={40}
           />
           <Tooltip
-            content={<InterestTooltip />}
+            content={<InterestTooltip dateFormat={dateFormat} />}
             cursor={{ stroke: "var(--color-fg-tertiary)", strokeWidth: 1 }}
           />
           <Area

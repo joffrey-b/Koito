@@ -45,8 +45,8 @@ If the environment variable is defined without **and** with the suffix at the sa
 
 ##### KOITO_CALENDAR_PERIODS
 
-- Default: `false`
-- Description: When `true`, the `day`, `week`, `month`, and `year` period options (used for top tracks/albums/artists and similar stats) are anchored to calendar boundaries (start of today, start of the current week, start of the current month, start of the current year) instead of rolling windows (last 24 hours, last 7 days, etc). `all_time` is unaffected. The week start day used for the `week` period follows `KOITO_WEEK_START` if set, otherwise the browser's detected locale week start, otherwise Monday.
+- Default: `false`, which keeps the existing rolling-window behavior (last 24 hours, last 7 days, last month, last year) exactly as-is.
+- Description: When set to `true`, the `day`, `week`, `month`, and `year` period options (used for top tracks/albums/artists and similar stats) are anchored to calendar boundaries instead: since midnight today, since the start of the current week, since the 1st of the current month, since January 1st of the current year. `all_time` is unaffected in either mode. The week start day used for the `week` period follows `KOITO_WEEK_START` if set, otherwise the browser's detected locale week start, otherwise Monday.
 
 ##### KOITO_LOGIN_GATE
 

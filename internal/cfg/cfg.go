@@ -199,14 +199,8 @@ func loadConfig(getenv func(string) string, version string) (*config, error) {
 	cfg.defaultTheme = getenv(DEFAULT_THEME_ENV)
 
 	rawDateFormat := getenv(DATE_FORMAT_ENV)
-	if rawDateFormat != "" {
-		validFormat := regexp.MustCompile(`^(DD|MM|YYYY)([-/.](DD|MM|YYYY)){2}$`)
-		if !validFormat.MatchString(rawDateFormat) ||
-			!strings.Contains(rawDateFormat, "DD") ||
-			!strings.Contains(rawDateFormat, "MM") ||
-			!strings.Contains(rawDateFormat, "YYYY") {
-			return nil, fmt.Errorf("loadConfig: %s must use DD, MM, and YYYY tokens with a single / - or . separator (e.g. DD/MM/YYYY)", DATE_FORMAT_ENV)
-		}
+	if rawDateFormat != "" && !isValidDateFormat(rawDateFormat) {
+		return nil, fmt.Errorf("loadConfig: %s must use DD, MM, and YYYY tokens exactly once each, separated by a single consistent / - or . separator (e.g. DD/MM/YYYY)", DATE_FORMAT_ENV)
 	}
 	cfg.dateFormat = rawDateFormat
 
@@ -274,6 +268,32 @@ func loadConfig(getenv func(string) string, version string) (*config, error) {
 		cfg.logLevel = 1
 	}
 	return cfg, nil
+}
+
+// isValidDateFormat reports whether s is DD, MM, and YYYY each appearing
+// exactly once, joined by a single consistent separator (one of / - .).
+// Go's regexp package has no backreference support, so this can't be
+// expressed as a single regex requiring the same separator twice - it's
+// checked by splitting on each candidate separator in turn instead.
+func isValidDateFormat(s string) bool {
+	for _, sep := range []string{"/", "-", "."} {
+		parts := strings.Split(s, sep)
+		if len(parts) != 3 {
+			continue
+		}
+		seen := map[string]bool{}
+		for _, p := range parts {
+			if p != "DD" && p != "MM" && p != "YYYY" {
+				seen = nil
+				break
+			}
+			seen[p] = true
+		}
+		if len(seen) == 3 {
+			return true
+		}
+	}
+	return false
 }
 
 func parseBool(s string) bool {

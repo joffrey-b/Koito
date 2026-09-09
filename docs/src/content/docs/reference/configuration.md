@@ -31,6 +31,11 @@ If the environment variable is defined without **and** with the suffix at the sa
 - Default: `false`
 - Description: When `true`, Koito will not show any statistics unless the user is logged in.
 
+##### KOITO_CALENDAR_PERIODS
+
+- Default: `false`
+- Description: When `true`, the `day`, `week`, `month`, and `year` period options (used for top tracks/albums/artists and similar stats) are anchored to calendar boundaries (start of today, start of the current week, start of the current month, start of the current year) instead of rolling windows (last 24 hours, last 7 days, etc). `all_time` is unaffected. The week start day used for the `week` period follows the browser's detected locale week start, falling back to Monday if that can't be determined.
+
 ##### KOITO_BIND_ADDR
 
 - Description: The address to bind to. The default blank value is equivalent to `0.0.0.0`.

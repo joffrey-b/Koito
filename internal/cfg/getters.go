@@ -114,6 +114,12 @@ func WeekStart() string {
 	return globalConfig.weekStart
 }
 
+func CalendarPeriods() bool {
+	lock.RLock()
+	defer lock.RUnlock()
+	return globalConfig.calendarPeriods
+}
+
 func DeezerDisabled() bool {
 	lock.RLock()
 	defer lock.RUnlock()

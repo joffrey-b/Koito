@@ -14,6 +14,12 @@ type Timeframe struct {
 	From     time.Time
 	To       time.Time
 	Timezone *time.Location
+
+	// CalendarAnchored and WeekStartDay only affect the Period-derived branch
+	// of TimeframeToTimeRange. Zero values (false, Sunday) preserve rolling-
+	// window behavior, so callers that don't set them are unaffected.
+	CalendarAnchored bool
+	WeekStartDay     time.Weekday
 }
 
 func TimeframeToTimeRange(tf Timeframe) (t1, t2 time.Time) {
@@ -96,7 +102,7 @@ func TimeframeToTimeRange(tf Timeframe) (t1, t2 time.Time) {
 	// ---------------------------------------------------------------------
 
 	if !tf.Period.IsZero() {
-		return StartTimeFromPeriod(tf.Period), now
+		return StartTimeFromPeriod(tf.Period, now, tf.CalendarAnchored, loc, tf.WeekStartDay), now
 	}
 
 	// ---------------------------------------------------------------------

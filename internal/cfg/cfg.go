@@ -15,6 +15,20 @@ const (
 	defaultMusicBrainzUrl = "https://musicbrainz.org"
 )
 
+// WeekdayNames is the canonical mapping from the day-name strings accepted by
+// KOITO_WEEK_START to Go's time.Weekday. Shared by loadConfig's validation and
+// by callers (e.g. engine/handlers) that need to resolve KOITO_WEEK_START to a
+// time.Weekday, so the accepted name set can't drift between the two.
+var WeekdayNames = map[string]time.Weekday{
+	"Sunday":    time.Sunday,
+	"Monday":    time.Monday,
+	"Tuesday":   time.Tuesday,
+	"Wednesday": time.Wednesday,
+	"Thursday":  time.Thursday,
+	"Friday":    time.Friday,
+	"Saturday":  time.Saturday,
+}
+
 const (
 	// BASE_URL_ENV                  = "KOITO_BASE_URL"
 	DATABASE_URL_ENV               = "KOITO_DATABASE_URL"
@@ -53,6 +67,7 @@ const (
 	DATE_FORMAT_ENV                = "KOITO_DATE_FORMAT"
 	CLOCK_FORMAT_ENV               = "KOITO_CLOCK_FORMAT"
 	WEEK_START_ENV                 = "KOITO_WEEK_START"
+	CALENDAR_PERIODS_ENV           = "KOITO_CALENDAR_PERIODS"
 )
 
 type config struct {
@@ -95,6 +110,7 @@ type config struct {
 	dateFormat             string
 	clockFormat            string
 	weekStart              string
+	calendarPeriods        bool
 }
 
 var (
@@ -199,14 +215,8 @@ func loadConfig(getenv func(string) string, version string) (*config, error) {
 	cfg.defaultTheme = getenv(DEFAULT_THEME_ENV)
 
 	rawDateFormat := getenv(DATE_FORMAT_ENV)
-	if rawDateFormat != "" {
-		validFormat := regexp.MustCompile(`^(DD|MM|YYYY)([-/.](DD|MM|YYYY)){2}$`)
-		if !validFormat.MatchString(rawDateFormat) ||
-			!strings.Contains(rawDateFormat, "DD") ||
-			!strings.Contains(rawDateFormat, "MM") ||
-			!strings.Contains(rawDateFormat, "YYYY") {
-			return nil, fmt.Errorf("loadConfig: %s must use DD, MM, and YYYY tokens with a single / - or . separator (e.g. DD/MM/YYYY)", DATE_FORMAT_ENV)
-		}
+	if rawDateFormat != "" && !isValidDateFormat(rawDateFormat) {
+		return nil, fmt.Errorf("loadConfig: %s must use DD, MM, and YYYY tokens exactly once each, separated by a single consistent / - or . separator (e.g. DD/MM/YYYY)", DATE_FORMAT_ENV)
 	}
 	cfg.dateFormat = rawDateFormat
 
@@ -216,15 +226,13 @@ func loadConfig(getenv func(string) string, version string) (*config, error) {
 	}
 	cfg.clockFormat = rawClockFormat
 
-	validWeekDays := map[string]bool{
-		"Monday": true, "Tuesday": true, "Wednesday": true, "Thursday": true,
-		"Friday": true, "Saturday": true, "Sunday": true,
-	}
 	rawWeekStart := getenv(WEEK_START_ENV)
-	if rawWeekStart != "" && !validWeekDays[rawWeekStart] {
+	if _, ok := WeekdayNames[rawWeekStart]; rawWeekStart != "" && !ok {
 		return nil, fmt.Errorf("loadConfig: %s must be one of: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday", WEEK_START_ENV)
 	}
 	cfg.weekStart = rawWeekStart
+
+	cfg.calendarPeriods = parseBool(getenv(CALENDAR_PERIODS_ENV))
 
 	cfg.configDir = getenv(CONFIG_DIR_ENV)
 	if cfg.configDir == "" {
@@ -274,6 +282,32 @@ func loadConfig(getenv func(string) string, version string) (*config, error) {
 		cfg.logLevel = 1
 	}
 	return cfg, nil
+}
+
+// isValidDateFormat reports whether s is DD, MM, and YYYY each appearing
+// exactly once, joined by a single consistent separator (one of / - .).
+// Go's regexp package has no backreference support, so this can't be
+// expressed as a single regex requiring the same separator twice - it's
+// checked by splitting on each candidate separator in turn instead.
+func isValidDateFormat(s string) bool {
+	for _, sep := range []string{"/", "-", "."} {
+		parts := strings.Split(s, sep)
+		if len(parts) != 3 {
+			continue
+		}
+		seen := map[string]bool{}
+		for _, p := range parts {
+			if p != "DD" && p != "MM" && p != "YYYY" {
+				seen = nil
+				break
+			}
+			seen[p] = true
+		}
+		if len(seen) == 3 {
+			return true
+		}
+	}
+	return false
 }
 
 func parseBool(s string) bool {

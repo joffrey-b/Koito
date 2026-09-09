@@ -43,6 +43,11 @@ If the environment variable is defined without **and** with the suffix at the sa
 - Description: The first day of the week to use in the activity grid. Accepted values are `Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`, `Saturday`, and `Sunday`. When not set, the browser locale determines the first day (falls back to Monday in Firefox).
 - Example: `Monday` for most European locales
 
+##### KOITO_CALENDAR_PERIODS
+
+- Default: `false`
+- Description: When `true`, the `day`, `week`, `month`, and `year` period options (used for top tracks/albums/artists and similar stats) are anchored to calendar boundaries (start of today, start of the current week, start of the current month, start of the current year) instead of rolling windows (last 24 hours, last 7 days, etc). `all_time` is unaffected. The week start day used for the `week` period follows `KOITO_WEEK_START` if set, otherwise the browser's detected locale week start, otherwise Monday.
+
 ##### KOITO_LOGIN_GATE
 
 - Default: `false`
